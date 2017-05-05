@@ -1,0 +1,12 @@
+---
+# file: playbook.yml
+#   Use this file to run the galaxy-tool-install script
+
+# Use this role via the following command:
+#
+#   % ansible-playbook playbook.yml
+#
+- hosts: hosts
+  become: yes
+  roles:
+    - role: install_brew_and_tools
