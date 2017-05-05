@@ -1,0 +1,127 @@
+#
+# yaml file to install other bioinformatics tools via brew
+#
+# Part of the microgvl.ansible.filesystem role for the GVL project.
+
+# Install extra python packages to linuxbrew python.
+- name: Install some extra python packages to linuxbrew python.
+  pip: name="{{ item }}" executable=pip2
+  with_items:
+    - numpy
+    - biopython
+    - matplotlib
+    - htseq
+    - khmer
+    - click
+    - nesoni
+    - DendroPy
+    - ncbi-genome-download
+    - bioblend
+  environment: "{{ linuxbrew_env }}"
+
+# Install some python3 packages too!
+- name: Install some python3 packages
+  pip: name="{{ item }}" executable=pip3
+  with_items:
+    - numpy
+    - matplotlib
+  environment: "{{ linuxbrew_env }}"
+
+- name: Install extra brew items
+  homebrew: name="{{ item }}"
+  environment: "{{ linuxbrew_env }}"
+  with_items:
+    - trimmomatic
+    - sratoolkit
+    - figtree
+    - vsearch
+    - andi
+    - mash
+    - kallisto
+    - salmon
+    - bcftools
+    - artemis
+    - ascp
+    - bandage
+    - beast
+    - bedtools
+    - blast-legacy
+    - blat
+    - breseq
+    - bwa
+    - canu
+    - clonalframeml
+    - discovardenovo
+    - dsk
+    - emboss
+    - figtree
+    - flash
+    - gnuplot
+    - gubbins
+    - ispcr
+    - jellyfish
+    - mash
+    - mcl
+    - megahit
+    - mhap
+    - minia
+    - miniasm
+    - minimap
+    - mrbayes
+    - mummer
+    - muscle
+    - nanopolish
+    - newick-utils
+    - newicktools
+    - oases
+    - parsnp  
+    - pbzip2
+    - plink
+    - possum-search
+    - primer3
+    - proteinortho
+    - quast
+    - raxml
+    - readseq
+    - seqtk
+    - sga
+    - tabtk
+    - transpose  
+    - trf  
+    - trimal   
+    - vcflib  
+    - vcftools  
+    - velvet
+    - genometools  
+    - circlator
+    - clustal-omega
+    - clustal-w
+    - bowtie
+    - bowtie2
+    - fasta
+    - phyml
+    - paml
+    - fastml  
+    - sdsl-lite  
+    - htslib
+    - idba
+
+- name: Install trinity
+  homebrew: name=trinity install_options=without-express
+  environment: "{{ linuxbrew_env }}"
+
+#Install some extra R libraries
+- name: Add some R packages.
+  command: >
+    Rscript --slave --no-save --no-restore-history -e "if (! ('{{ item }}' %in% installed.packages()[,'Package'])) { install.packages(pkgs='{{ item }}', repos=c('http://cran.ms.unimelb.edu.au/')); print('Added'); } else { print('Already installed'); }"
+  register: r_result
+  failed_when: "r_result.rc != 0 or 'had non-zero exit status' in r_result.stderr"
+  changed_when: "'Added' in r_result.stdout"
+  with_items:
+    - ape
+    - nesoni-r
+    - DESeq2
+    - edgeR
+    - limma
+  become: yes
+  become_user: root

@@ -1,0 +1,40 @@
+# micro_gvl_cmd_apps.yml
+
+# This script will install all of the command line tools for the mGVL including Mauve, IGV, Artemis and the nullarbor suite of programs. (Nullarbor, Prokka, Snippy, etc.)
+
+# Start by making sure that the directory /mnt/gvl/apps exists..
+
+- name: Check gvl_apps directory exists
+  file: name="{{ gvl_app_path }}" state=directory owner=ubuntu group=ubuntu
+  sudo: yes
+  sudo_user: root
+
+#create a temporary directory to hold module files, environment files etc.
+- name: Create a directory to hold the module files and environment scripts.
+  file: name="{{ gvl_app_path }}/scripts" state=directory owner=ubuntu group=ubuntu
+  sudo: yes
+  sudo_user: root
+
+- name: Create the modulefiles dir.
+  file: name="{{ gvl_app_path }}/scripts/modulefiles" state=directory owner=ubuntu group=ubuntu
+  sudo: yes
+  sudo_user: ubuntu
+
+- name: Copy the copy_modules script to the poststart.d directory.
+  template: src=copy_modules.j2 dest=/mnt/galaxy/gvl/poststart.d/copy_modules mode=0755
+  sudo: yes
+  sudo_user: root
+
+- name: Copy the postinstall ansible script to the scripts dir.
+  copy: src="system-ansible.yml" dest="{{ gvl_app_path }}/scripts/system-ansible.yml"
+  sudo: yes
+  sudo_user: ubuntu
+
+#Include statements for the other tools. Starting with linux brew
+- include: install_linuxbrew.yml
+
+#Install nullarbor and associated packages via brew
+- include: install_nullarbor.yml
+
+#Install other packages via brew, R and pip
+- include: install_other_brew_tools.yml

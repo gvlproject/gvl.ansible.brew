@@ -1,0 +1,50 @@
+#
+# Vars for the brew commandline filesystem for the microbial version of the GVL
+#
+
+#microgvl_galaxy_tools_tool_list: [ "roles/gvl.ansible.filesystem/files/scripts/shed_tool_list.yaml.gvl", "roles/microgvl.ansible.filesystem/files/scripts/shed_tool_list.yaml.mgvl" ]
+
+# microgvl_fs_name: "mGVL filesystem"
+# microgvl_fs_flavour: "Microbial GVL"
+# microgvl_fs_version: "0.2-1"
+# microgvl_galaxy_brand: "mGVL {{ gvl_fs_version }}"
+# microgvl_cloudman_bucket_name: cloudman-os
+# microgvl_fs_archive_name: "microgvl-fs-{{ gvl_fs_version }}.tar.gz"
+
+microgvl_fs_archive_path: /mnt/galaxy_archive
+OS_AUTH_URL: https://keystone.rc.nectar.org.au:5000/v2.0/
+OS_TENANT_ID: [put id here]
+OS_TENANT_NAME: [put tenant here]
+OS_USERNAME: [put user here]
+OS_PASSWORD: [put password here]
+
+# micro_cmg_extra_files:
+#   - src: roles/gvl.ansible.filesystem/files/galaxy-app
+#     dest: "{{ galaxyFS_base_dir }}"
+#   - src: roles/gvl.ansible.filesystem/files/galaxy-var/
+#     dest: "{{ galaxyFS_base_dir }}/var/"
+#   - src: roles/microgvl.ansible.filesystem/files/galaxy-app
+#     dest: "{{ galaxyFS_base_dir }}"
+
+#vars specific to the mGVL alone..
+
+gvl_app_path: "/mnt/gvl/apps"
+gvl_tmp_path: "/mnt/gvl/tmp"
+
+microgvl_homebrew_temp: "{{ gvl_tmp_path }}/homebrew_temp"
+microgvl_homebrew_cache: "{{ gvl_tmp_path }}/homebrew_cache"
+homebrew_home: "/home/linuxbrew"
+homebrew_path: "{{ homebrew_home }}/.linuxbrew"
+
+
+
+#linuxbrew environment dictionary
+linuxbrew_env:
+    LD_LIBRARY_PATH: ""
+    PATH: "{{ homebrew_path }}/bin:{{ homebrew_path }}/sbin:{{ ansible_env.PATH }}"
+    MANPATH: "{{ homebrew_path }}/share/man"
+    INFOPATH: "{{ homebrew_path }}/share/info"
+    HOMEBREW_TEMP: "{{ microgvl_homebrew_temp }}"
+    HOMEBREW_CACHE: "{{ microgvl_homebrew_cache }}"
+    TEMPDIR: "{{ gvl_tmp_path }}"
+    TEMP: "{{ gvl_tmp_path}}"

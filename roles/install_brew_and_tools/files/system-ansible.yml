@@ -1,0 +1,104 @@
+#System-ansible.yml
+#This script is part of the Genomics Virtual Lab (GVL) project.
+#GVL Authors, 2016
+
+#This script is to change the base image partition post launch.
+#It installs system packages, adds some directories and installs some extra R
+#libraries. This is necessary as there is no way to alter the image
+#at build time.
+
+- name: install some system packages on localhost
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    #------------
+    # The following have all been moved to the gvl base image as of version 4.1.
+
+
+    #Install some extra system packages for microbial tools and linux brew
+    - name: Update the apt cache
+      apt: update_cache=yes
+      become: yes
+      become_user: root
+    
+    - name: install some system packages
+      apt: pkg="{{ item }}" state=latest
+      with_items:
+        - build-essential
+        - curl
+        - git
+        - m4
+        - ruby
+        - texinfo
+        - libbz2-dev
+        - libcurl4-openssl-dev
+        - libexpat-dev
+        - libncurses-dev
+        - zlib1g-dev
+        - cpanminus
+        - oracle-java8-installer
+      become: yes
+      become_user: root
+    
+    #Install some extra perl modules for microbial tools
+    - name: Install required perl modules
+      cpanm: name="{{ item }}" notest=yes
+      with_items:
+        - Bio::Roary
+      become: yes
+      become_user: root
+    #
+    - name: Upgrade List::Util
+      command: cpanm --upgrade List::Util
+      become: yes
+      become_user: root
+
+    #Create some temporary directories for linuxbrew incase theiyre not there already
+    - name: Create the homebrew_temp directory
+      file: dest="/mnt/gvl/tmp/homebrew_temp" state=directory owner=ubuntu group=ubuntu
+      become: yes
+      become_user: root
+
+    - name: Create the homebrew_cache directory
+      file: dest="/mnt/gvl/tmp/homebrew_cache" state=directory owner=ubuntu group=ubuntu
+      become: yes
+      become_user: root
+      
+    - name: Create the homebrew home location in /home
+      file: dest=/home/linuxbrew state=directory owner=ubuntu group=ubuntu
+      become: yes
+      become_user: root
+      
+    - name: Add the bindmount for linuxbew to fstab
+      mount:
+        name: /home/linuxbrew
+        src: "/mnt/gvl/apps/linuxbrew"
+        opts: bind
+        fstype: none
+        state: present
+      register: fstab
+      become: yes
+      become_user: root
+
+    - name: Reload fstab
+      command: mount -a
+      #when: fstab.changed
+      become: yes
+      become_user: root
+
+    #Install some extra R libraries
+    - name: Add some R packages.
+      command: >
+        Rscript --slave --no-save --no-restore-history -e "if (! ('{{ item }}' %in% installed.packages()[,'Package'])) { install.packages(pkgs='{{ item }}', repos=c('http://cran.ms.unimelb.edu.au/')); print('Added'); } else { print('Already installed'); }"
+      register: r_result
+      failed_when: "r_result.rc != 0 or 'had non-zero exit status' in r_result.stderr"
+      changed_when: "'Added' in r_result.stdout"
+      with_items:
+        - ape
+        - nesoni-r
+        - DESeq2
+        - edgeR
+        - limma
+      become: yes
+      become_user: root

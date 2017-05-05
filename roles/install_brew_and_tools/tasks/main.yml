@@ -1,0 +1,3 @@
+- include: micro_gvl_cmd_apps.yml
+  sudo: yes
+  sudo_user: ubuntu
