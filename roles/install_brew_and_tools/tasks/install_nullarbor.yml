@@ -14,6 +14,7 @@
     - YAML::Tiny
     - Bio::Roary
     - https://github.com/chapmanb/vcftools-cpan/archive/v0.953.tar.gz
+    - JSON
   become: yes
   become_user: root
 
@@ -85,6 +86,7 @@
   shell: "mv {{ homebrew_path }}/Cellar/kraken/krakendb/minikraken*/* {{ homebrew_path }}/Cellar/kraken/krakendb/"
   become: yes
   become_user: ubuntu
+  ignore_errors: yes
 
 - name: update the perl List::Util version
   command: cpanm --upgrade List::Util

@@ -85,10 +85,17 @@
   become: yes
   become_user: ubuntu
 
-#- debug: msg="Current ansible environment PATH = {{ ansible_env.PATH }}"
-#- debug: msg="Current ansible envorinment = {{ ansible_env }}"
-#- debug: msg="Current gvl_app_path = {{ gvl_app_path }}"
-#- debug: msg="Current environment = {{ ansible_env | to_nice_json }}"
+# - debug: msg="Current ansible environment PATH = {{ ansible_env.PATH }}"
+# - debug: msg="Current ansible envorinment = {{ ansible_env }}"
+# - debug: msg="Current gvl_app_path = {{ gvl_app_path }}"
+# - debug: msg="Current environment = {{ ansible_env | to_nice_json }}"
+
+- name: Update brew
+  command: "brew update"
+  environment: "{{ linuxbrew_env }}"
+  become: yes
+  become_user: ubuntu
+  ignore_errors: yes
 
 # Install ruby and hello to run a test.. Then link glibc into the correct place.
 - name: Install hello and ruby to get gcc
