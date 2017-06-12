@@ -1,0 +1,15 @@
+# ansible to check if kraken indices file exists and if it does, copy in the .loc file
+
+- name: Check to see if indices directory exists for kraken.
+  stat: 
+    path: /mnt/galaxyIndices/tool-data/dm/toolshed.g2.bx.psu.edu/repos/devteam/kraken/b2392a9dfb01
+  register: kraken_dir_stat
+  
+- name: copy the kraken .loc file to the directory
+  copy:
+    src: kraken_databases.loc
+    dest: /mnt/galaxyIndices/tool-data/dm/toolshed.g2.bx.psu.edu/repos/devteam/kraken/b2392a9dfb01/kraken_databases.loc
+    owner: galaxy
+    group: galaxy
+    mode: 0755
+    force: yes

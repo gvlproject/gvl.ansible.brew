@@ -38,3 +38,6 @@
 
 #Install other packages via brew, R and pip
 - include: install_other_brew_tools.yml
+
+#Add the minikraken database to the Galaxy tool if it exists.
+- include: add_minikraken_db_to_Galaxy.yml
