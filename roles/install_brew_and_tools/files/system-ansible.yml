@@ -98,3 +98,17 @@
         - limma
       become: yes
       become_user: root
+      
+    # Expose the minikraken database to the Galaxy Kraken tool.
+    - name: Check to see if indices directory exists for kraken.
+      stat:
+        path: /mnt/galaxyIndices/tool-data/dm/toolshed.g2.bx.psu.edu/repos/devteam/kraken/b2392a9dfb01/kraken_databases.loc
+      register: krakendb_stat
+
+    - name: add the linuxbrew krakendb to the kraken .loc file
+      lineinfile:
+        dest: '/mnt/galaxyIndices/tool-data/dm/toolshed.g2.bx.psu.edu/repos/devteam/kraken/b2392a9dfb01/kraken_databases.loc'
+        regexp: '^krakendb\s'
+        line: "krakendb\tkrakendb\t/mnt/gvl/apps/linuxbrew/.linuxbrew/Cellar/kraken/"
+        state: 'present'
+      when: krakendb_stat.stat.exists
